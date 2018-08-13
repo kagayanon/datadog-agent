@@ -9,6 +9,7 @@ package secrets
 
 import (
 	"fmt"
+	"os/exec"
 	"os/user"
 	"syscall"
 )
@@ -42,5 +43,9 @@ func checkRights(path string) error {
 		return fmt.Errorf("invalid executable: '%s' isn't owned by the user running the agent: name '%s', UID %s. We can't execute it", path, usr.Username, usr.Uid)
 	}
 
+	return nil
+}
+
+func setCmdSysProcAttr(cmd *exec.Cmd) error {
 	return nil
 }

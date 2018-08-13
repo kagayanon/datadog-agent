@@ -3,8 +3,6 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
 // Copyright 2018 Datadog, Inc.
 
-// +build !windows
-
 package secrets
 
 import (
@@ -57,6 +55,10 @@ func execCommand(inputPayload string) ([]byte, error) {
 	}
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+
+	if err := setCmdSysProcAttr(cmd); err != nil {
+		return nil, fmt.Errorf("error executing secret_backend_command: %s", err)
+	}
 
 	err := cmd.Run()
 	if err != nil {
