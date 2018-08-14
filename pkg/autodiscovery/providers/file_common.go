@@ -3,4 +3,15 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
 // Copyright 2018 Datadog, Inc.
 
-package autodiscovery
+// +build !android
+
+package providers
+
+import (
+	"io/ioutil"
+)
+
+var (
+	readDirPtr  = ioutil.ReadDir
+	readFilePtr = ioutil.ReadFile
+)

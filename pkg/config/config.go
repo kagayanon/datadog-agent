@@ -313,12 +313,14 @@ func init() {
 	Datadog.BindEnv("cluster_agent.cmd_port")
 	Datadog.BindEnv("cluster_agent.kubernetes_service_name")
 	BindEnvAndSetDefault("hpa_watcher_polling_freq", 10)
-	BindEnvAndSetDefault("hpa_configmap_name", "datadog-hpa")
+
 	BindEnvAndSetDefault("external_metrics_provider.enabled", false)
+	BindEnvAndSetDefault("hpa_configmap_name", "datadog-custom-metrics")
 	BindEnvAndSetDefault("external_metrics_provider.polling_freq", 30)
 	BindEnvAndSetDefault("external_metrics_provider.max_age", 60)
 	BindEnvAndSetDefault("external_metrics_provider.bucket_size", 60*5)
-	BindEnvAndSetDefault("kubernetes_metadata_resync_period", 60*5) // 5 minutes
+	BindEnvAndSetDefault("kubernetes_informers_resync_period", 60*5)    // 5 minutes
+	BindEnvAndSetDefault("kubernetes_informers_restclient_timeout", 60) // 1 minute
 
 	Datadog.BindEnv("forwarder_timeout")
 	Datadog.BindEnv("forwarder_retry_queue_max_size")
@@ -332,6 +334,8 @@ func init() {
 	Datadog.BindEnv("kube_resources_namespace")
 
 	Datadog.BindEnv("collect_ec2_tags")
+
+	setAssetFs()
 }
 
 // BindEnvAndSetDefault sets the default value for a config parameter, and adds an env binding
@@ -425,9 +429,12 @@ func loadProxyFromEnv() {
 
 // Load reads configs files and initializes the config module
 func Load() error {
+	log.Infof("config.Load()")
 	if err := Datadog.ReadInConfig(); err != nil {
+		log.Warnf("confrig.load() error %v", err)
 		return err
 	}
+	log.Infof("config.load succeeded")
 
 	// We have to init the secrets package before we can use it to decrypt
 	// anything.

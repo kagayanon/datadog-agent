@@ -9,6 +9,13 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/util/containers/metrics"
 )
 
+// Known container runtimes
+const (
+	RuntimeNameDocker     string = "docker"
+	RuntimeNameContainerd string = "containerd"
+	RuntimeNameCRIO       string = "cri-o"
+)
+
 // Supported container states
 const (
 	ContainerUnknownState    string = "unknown"
