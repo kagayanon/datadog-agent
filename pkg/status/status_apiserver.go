@@ -9,11 +9,12 @@ package status
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/DataDog/datadog-agent/pkg/clusteragent/custommetrics"
 	"github.com/DataDog/datadog-agent/pkg/util/clusteragent"
 	"github.com/DataDog/datadog-agent/pkg/util/kubernetes/apiserver"
 	"github.com/DataDog/datadog-agent/pkg/util/kubernetes/apiserver/leaderelection"
-	"time"
 )
 
 func getLeaderElectionDetails() map[string]string {
@@ -66,14 +67,14 @@ func GetHorizontalPodAutoscalingStatus() map[string]interface{} {
 	horizontalPodAutoscalingStatus["Cmname"] = datadogHPAConfigMap
 
 	store, err := custommetrics.NewConfigMapStore(apiCl.Cl, apiserver.GetResourcesNamespace(), datadogHPAConfigMap)
-	externalMetrics, err := store.ListAllExternalMetricValues()
+	bundle, err := store.Dump()
 	if err != nil {
 		horizontalPodAutoscalingStatus["ErrorStore"] = err.Error()
 		return horizontalPodAutoscalingStatus
 	}
 
-	horizontalPodAutoscalingStatus["Number"] = len(externalMetrics)
-	horizontalPodAutoscalingStatus["Metrics"] = externalMetrics
+	horizontalPodAutoscalingStatus["Number"] = len(bundle.External)
+	horizontalPodAutoscalingStatus["Metrics"] = bundle.External
 
 	return horizontalPodAutoscalingStatus
 }
